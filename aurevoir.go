@@ -29,16 +29,16 @@ func commitsHandler(w http.ResponseWriter, req *http.Request) {
 
 	params := map[string]interface{}{
 		"project": project,
-		"commits": map[string]string {
-      "eee": "This is the 5th commit",
-      "ddd": "This is the 4th commit",
-      "ccc": "This is the 3er commit",
-      "bbb": "This is the 2nd commit",
-      "aaa": "This is the 1st commit",
-    },
+		"commits": map[string]string{
+			"eee": "This is the 5th commit",
+			"ddd": "This is the 4th commit",
+			"ccc": "This is the 3er commit",
+			"bbb": "This is the 2nd commit",
+			"aaa": "This is the 1st commit",
+		},
 	}
 
-  templates.ExecuteTemplate(w, "listing.html", params)
+	templates.ExecuteTemplate(w, "listing.html", params)
 }
 
 func commitHandler(w http.ResponseWriter, req *http.Request) {
