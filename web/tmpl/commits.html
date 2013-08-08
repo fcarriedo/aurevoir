@@ -9,10 +9,10 @@
       <tr><th>Commit ID</th><th>Message</th></tr>
     </thead>
     <tbody id='commit-listing'>
-      {{range $k, $v := .commits}}
-      <tr id='{{ $k }}'>
-        <td><a href='/{{ $project }}/commits/{{ $k }}'>{{ $k }}</a></td>
-        <td><a href='/{{ $project }}/commits/{{ $k }}'>{{ $v }}</a></td>
+      {{range $k, $commit := .commits}}
+      <tr id='{{ $commit.Id }}'>
+        <td><a href='/{{ $project }}/commits/{{ $commit.Id }}'>{{ $commit.Id }}</a></td>
+        <td><a href='/{{ $project }}/commits/{{ $commit.Id }}'>{{ $commit.Msg }}</a></td>
       </tr>
       {{end}}
     </tbody>

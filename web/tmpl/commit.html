@@ -1,0 +1,11 @@
+{{ template "header" }}
+
+  <p class='lead text-info'>commit {{ .Id }} <small>{{ .Msg }}</small></p>
+
+  <p>
+    <pre>
+      {{ .Data }}
+    </pre>
+  </p>
+
+{{ template "footer" }}
