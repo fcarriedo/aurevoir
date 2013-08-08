@@ -1,0 +1,21 @@
+{{ template "header" }}
+
+  {{ $project := .project }}
+
+  <p class='lead text-info'>Commit listing for project '<em>{{ $project }}</em>'</p>
+
+  <table class='table table-bordered table-striped table-condensed'>
+    <thead>
+      <tr><th>Commit ID</th><th>Message</th></tr>
+    </thead>
+    <tbody id='commit-listing'>
+      {{range $k, $v := .commits}}
+      <tr id='{{ $k }}'>
+        <td><a href='/{{ $project }}/commits/{{ $k }}'>{{ $k }}</a></td>
+        <td><a href='/{{ $project }}/commits/{{ $k }}'>{{ $v }}</a></td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+
+{{ template "footer" }}
