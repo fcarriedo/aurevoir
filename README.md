@@ -27,8 +27,10 @@ MVP Features:
   * Comment on lines
   * Ability to LGTM or decline-improve workflow (w/ optional msg) - Notifies commiter
   * Ability to reassign reviewer
+  * Supports git
 
 Advanced:
 
   * Render Markdown in comments
+  * Supports SVN
 
