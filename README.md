@@ -1,7 +1,7 @@
 aurevoir
 ========
 
-The simple code review tool
+A simple code review tool
 
 Add message in commit:
 

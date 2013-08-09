@@ -69,20 +69,22 @@ func commitHandler(w http.ResponseWriter, req *http.Request) {
 	commitId := params["id"]
 
 	commit := getCommit(project, commitId)
-	commit.Msg = "This is a message"
 
 	templates.ExecuteTemplate(w, "commit.html", commit)
 }
 
 func getCommit(project, commitId string) commit {
-	cmd := exec.Command("git", "show", commitId)
+	cmd := exec.Command("git", "show", commitId, "--oneline")
 	cmd.Dir = *root + "/" + project
 	out, err := cmd.Output()
 	if err != nil {
 		log.Fatal("Couldn't get commit " + commitId)
 	}
 
-	return commit{Id: commitId, Data: "\n" + string(out)}
+  data := strings.SplitN(string(out), "\n", 2)
+  commitLine := strings.SplitN(data[0], " ", 2)
+
+  return commit{Id: commitLine[0], Msg: commitLine[1], Data: "\n" + data[1]}
 }
 
 func main() {
