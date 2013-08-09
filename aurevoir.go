@@ -27,7 +27,7 @@ type commit struct {
 }
 
 type CommitReader interface {
-	Commits() map[string]commit
+	Commits() (map[string]commit, error)
 }
 
 func init() {
@@ -53,10 +53,15 @@ func commitsHandler(w http.ResponseWriter, req *http.Request) {
 	project := mux.Vars(req)["project"]
 
 	cr := newCommitReader(*root + "/" + project)
+	commits, err := cr.Commits()
+	if err != nil {
+		fmt.Fprintf(w, err.Error())
+		return
+	}
 
 	params := map[string]interface{}{
 		"project": project,
-		"commits": cr.Commits(),
+		"commits": commits,
 	}
 
 	templates.ExecuteTemplate(w, "commits.html", params)
@@ -68,23 +73,27 @@ func commitHandler(w http.ResponseWriter, req *http.Request) {
 	project := params["project"]
 	commitId := params["id"]
 
-	commit := getCommit(project, commitId)
+	commit, err := getCommit(project, commitId)
+	if err != nil {
+		fmt.Fprintf(w, err.Error())
+		return
+	}
 
 	templates.ExecuteTemplate(w, "commit.html", commit)
 }
 
-func getCommit(project, commitId string) commit {
+func getCommit(project, commitId string) (commit, error) {
 	cmd := exec.Command("git", "show", commitId, "--oneline")
 	cmd.Dir = *root + "/" + project
 	out, err := cmd.Output()
 	if err != nil {
-		log.Fatal("Couldn't get commit " + commitId)
+		return commit{}, fmt.Errorf("'%s' doesn't appear to be a valid git repo", project)
 	}
 
-  data := strings.SplitN(string(out), "\n", 2)
-  commitLine := strings.SplitN(data[0], " ", 2)
+	data := strings.SplitN(string(out), "\n", 2)
+	commitLine := strings.SplitN(data[0], " ", 2)
 
-  return commit{Id: commitLine[0], Msg: commitLine[1], Data: "\n" + data[1]}
+	return commit{Id: commitLine[0], Msg: commitLine[1], Data: "\n" + data[1]}, nil
 }
 
 func main() {
@@ -121,12 +130,12 @@ func newCommitReader(dir string) CommitReader {
 	return &gitCommitReader{dir}
 }
 
-func (cr *gitCommitReader) Commits() map[string]commit {
+func (cr *gitCommitReader) Commits() (map[string]commit, error) {
 	cmd := exec.Command("git", "log", "--oneline", "-20", "--no-merges")
 	cmd.Dir = cr.baseDir
 	out, err := cmd.Output()
 	if err != nil {
-		log.Fatal(err)
+		return nil, fmt.Errorf("'%s' doesn't appear to be a valid git repo", cr.baseDir)
 	}
 
 	commits := make(map[string]commit)
@@ -137,5 +146,5 @@ func (cr *gitCommitReader) Commits() map[string]commit {
 		commits[c.Id] = c
 	}
 
-	return commits
+	return commits, nil
 }
