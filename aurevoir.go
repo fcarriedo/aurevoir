@@ -27,7 +27,7 @@ type commit struct {
 }
 
 type CommitReader interface {
-	Commits() (map[string]commit, error)
+	Commits() ([]commit, error)
 }
 
 func init() {
@@ -130,7 +130,7 @@ func newCommitReader(dir string) CommitReader {
 	return &gitCommitReader{dir}
 }
 
-func (cr *gitCommitReader) Commits() (map[string]commit, error) {
+func (cr *gitCommitReader) Commits() ([]commit, error) {
 	cmd := exec.Command("git", "log", "--oneline", "-20", "--no-merges")
 	cmd.Dir = cr.baseDir
 	out, err := cmd.Output()
@@ -138,12 +138,12 @@ func (cr *gitCommitReader) Commits() (map[string]commit, error) {
 		return nil, fmt.Errorf("'%s' doesn't appear to be a valid git repo", cr.baseDir)
 	}
 
-	commits := make(map[string]commit)
+	var commits []commit
 	scanner := bufio.NewScanner(strings.NewReader(string(out)))
 	for scanner.Scan() {
 		line := strings.SplitN(scanner.Text(), " ", 2)
 		c := commit{Id: line[0], Msg: line[1]}
-		commits[c.Id] = c
+		commits = append(commits, c)
 	}
 
 	return commits, nil
